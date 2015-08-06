@@ -83,6 +83,14 @@ class TestFormulaRenames < Minitest::Test
     `brew migrate libpng`
   end
 
+  def migrate_fully
+    `brew migrate vladshablinsky/taptest/libpng`
+  end
+
+  def migrate_core_fully
+    `brew migrate homebrew/homebrew/libpng`
+  end
+
   def uninstall
     `brew uninstall libpng`
   end
@@ -137,11 +145,12 @@ class TestFormulaRenames < Minitest::Test
     end
   end
 
-  def test_CI_CR
+  def test_migrate_CI_CR
     install_core
     assert_predicate HOMEBREW_CELLAR.join("libpng"), :directory?
     rename_core
-    migrate
+    assert_raises(RuntimeError) { shutup { migrate } }
+    migrate_core_fully
     assert migration_occured?, "Migration must have occured"
     check_migration
     run_zint
@@ -159,8 +168,6 @@ class TestFormulaRenames < Minitest::Test
   def test_migrate_TI_CR
     install_tap
     rename_core
-    assert_raises(RuntimeError) { shutup { migrate } }
-    refute migration_occured?, "Mustn't occur"
   end
 
   def test_migrate_TI_TR
@@ -191,8 +198,8 @@ class TestFormulaRenames < Minitest::Test
     rename_core
     rename_tap
     migrate
-    assert migration_occured?, "Migration must have occured"
     check_migration
+    assert migration_occured?, "Migration must have occured"
     run_zint
     uninstall
     check_uninstalled

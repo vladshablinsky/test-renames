@@ -76,10 +76,11 @@ class TestFormulaRenames < Minitest::Test
   end
 
   def update
-    `brew update`
+    `brew update --simulate-from-current-branch`
   end
 
   def migrate
+    puts "MIGRATE"
     `brew migrate libpng`
   end
 
@@ -149,8 +150,7 @@ class TestFormulaRenames < Minitest::Test
     install_core
     assert_predicate HOMEBREW_CELLAR.join("libpng"), :directory?
     rename_core
-    assert_raises(RuntimeError) { shutup { migrate } }
-    migrate_core_fully
+    migrate
     assert migration_occured?, "Migration must have occured"
     check_migration
     run_zint

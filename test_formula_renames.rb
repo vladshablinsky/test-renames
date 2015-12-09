@@ -193,6 +193,17 @@ class TestFormulaRenames < Minitest::Test
     check_uninstalled
   end
 
+  def test_migrate_CI_CR_TI
+    install_core
+    rename_core
+    migrate
+    assert migration_occured?, "Migration must have occured"
+    check_migration
+    run_zint
+    uninstall
+    check_uninstalled
+  end
+
   def test_migrate_TI_CR_TR
     install_tap
     rename_core
